@@ -30,9 +30,9 @@ const EmpCamera = () => {
     if (camera) {
       const data = await camera.takePictureAsync(null);
       setImage(data.uri);
-      // navigation.navigate('EmpQrCode',{
-      //   imageData:data.uri
-      // })
+      navigation.navigate('EmpQrCode',{
+        imageData:data.uri
+      })
     }
   };
   if (hasCameraPermission === false) {
@@ -79,7 +79,7 @@ const EmpCamera = () => {
       >
         <Text style={{ fontSize: 25 }}>
           Hello,
-           {data?.employeeLogin!=null?data?.employeeLogin[0]?.name:' admin'}
+           {/* {data.employeeLogin[0].name} */}
         </Text>
         {/* <TouchableOpacity onPress={() => navigation.navigate("AdminSettings")}>
           <Icon name="user" size={40} color={"white"} />

@@ -9,7 +9,8 @@ import {
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {useNavigation} from '@react-navigation/native'
-
+import { useSelector,useDispatch } from "react-redux";
+// import { SQLiteDatabase } from "expo-sqlite";
 
 // import camera from '../assets/images'
 // import camera from '../assets/images'
@@ -40,7 +41,7 @@ const ButtonsData = [
   },
   {
     id: 5,
-    btnName: "Shit",
+    btnName: "Shifts",
     btnIcon: require("../assets/images/shits.png"),
     btnScreen:'DailyShifts'
   },
@@ -54,7 +55,23 @@ const ButtonsData = [
 
 const HomeScreen = () => {
 
+  const data=useSelector(state=>state?.employees);
+  // console.log(data?.employeeLogin[0]?.name);
+  // console.log("data.setEmployeeLogin");
+  const dispatch=useDispatch()
+
+  
+
     const navigation=useNavigation()
+
+// const db=SQLiteDatabase.da
+
+
+
+
+
+
+
   return (
     <View style={{ height: "100%", alignItems: "center" }}>
       <View
@@ -69,8 +86,10 @@ const HomeScreen = () => {
           paddingRight: 10
         }}
       >
-        <Text style={{ fontSize: 25 }}>Hello, Jhon Doe</Text>
-        <TouchableOpacity>
+        <Text style={{ fontSize: 25 }}>Hello,
+        {data.employeeLogin? data?.employeeLogin[0]?.name:"admin"}
+        </Text>
+        <TouchableOpacity onPress={()=>navigation.navigate('AdminSettings')}>
           <Icon name="user" size={40} color={"white"} />
         </TouchableOpacity>
       </View>
@@ -129,16 +148,17 @@ const HomeScreen = () => {
                   tintColor: "white"
                 }}
               />
-              <Text style={styles.buttonText}>{item.btnName}</Text>
+              <Text style={styles.buttonText}>{item?.btnName}</Text>
             </TouchableOpacity>
             //   {/* Add another TouchableOpacity here if you want two boxes side by side */}
           ))}
         </View>
       </View>
+      
       <View
         style={{ height: "8%", width: "100%", backgroundColor: "#079DDF", justifyContent:"center", alignItems:"center" }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.navigate('Login')}>
           <Icon name="home" size={30} color={"white"} />
         </TouchableOpacity>
       </View>

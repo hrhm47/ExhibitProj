@@ -1,22 +1,3 @@
-// import { StatusBar } from 'expo-status-bar';
-
-
-
-
-
-
-
-
-
-
-
-/*
-button + calender working
-
-
-
-*/
-
 import {
   Platform,
   StyleSheet,
@@ -37,22 +18,27 @@ import Exhibits from "./src/screens/Exhibits";
 import Reports from "./src/screens/Reports";
 import Camera from "./src/screens/Camera";
 import ExhibitsIssues from "./src/screens/ExhibitsIssues";
+import AdminSettings from "./src/screens/AdminSettings";
 
-
+import { Provider } from "react-redux";
+import store from "./src/app/store/store";
+import EmpHomeScreen from "./src/screens/EmpHomeScreen";
+import EmpCamera from "./src/screens/EmpCamera";
+import EmpQrCode from "./src/screens/EmpQrCode";
+import EmpAttendance from "./src/screens/EmpAttendance";
+import EmpShifts from "./src/screens/EmpShifts";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <SafeAreaView style={styles.andriodSafeArea}>
-        {/* <View style={styles.container}> */}
-        {/* <WelcomeScreen/> */}
-        {/* <LoginScreen/> */}
+      <Provider store={store}>
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="Welcome"
             screenOptions={{ headerShown: false }}
           >
-            {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="DailyShifts" component={DailyShifts} />
@@ -61,18 +47,22 @@ export default function App() {
             <Stack.Screen name="ExhibitsIssues" component={ExhibitsIssues} />
             <Stack.Screen name="Camera" component={Camera} />
             <Stack.Screen name="Reports" component={Reports} />
-            
+            <Stack.Screen name="AdminSettings" component={AdminSettings} />
+            <Stack.Screen name="EmpHomeScreen" component={EmpHomeScreen} />
+            <Stack.Screen name="EmpCamera" component={EmpCamera} />
+            <Stack.Screen name="EmpQrCode" component={EmpQrCode} />
+            <Stack.Screen name="EmpAttendance" component={EmpAttendance} />
+            <Stack.Screen name="EmpShifts" component={EmpShifts} />
           </Stack.Navigator>
         </NavigationContainer>
         <StatusBar barStyle="default" />
-    {/* </View> */}
-      </SafeAreaView>
+      </Provider>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   andriodSafeArea: {
     backgroundColor: "#00073D",
     height: "100%"

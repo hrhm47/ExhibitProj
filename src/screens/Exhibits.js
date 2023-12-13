@@ -14,6 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import DailyShiftsComponents from "../components/DailyShiftsComponents";
 // import * as Calendar from 'expo-calendar';
 import { Calendar, Agenda } from "react-native-calendars";
+import {useSelector, useDispatch} from 'react-redux';
 
 const nameData = [
   {
@@ -60,12 +61,15 @@ const exhibitLocData = [
   }
 ];
 
-const DailyShifts = () => {
+const Exhibits = () => {
   const [employeName, setEmployeName] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [shiftType, setShitType] = useState("");
   const [openCalender, setOpenCalender] = useState(false);
+
+  const data = useSelector((state) => state?.employees);
+  // console.log("exibit data: ",data.employeeLogin?data.employeeLogin:" admin");
   return (
     <View
       style={{
@@ -78,12 +82,18 @@ const DailyShifts = () => {
       }}
     >
       <View style={styles.headerView}>
-        <Text style={{ fontSize: 25 }}>Hello, Jhon Doe</Text>
+        <Text style={{ fontSize: 25 }}>Hello, 
+        {data?.employeeLogin? data?.employeeLogin[0]?.name:" admin"}
+        
+        </Text>
       </View>
 
       <View style={styles.tagView}>
         <Text style={styles.textStyle((font = 25))}>Exhibit</Text>
       </View>
+<ScrollView style={{}} contentContainerStyle={{height:"100%", alignItems:"center"}} keyboardShouldPersistTaps="always" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets={true}
+
+>
       <View
         style={styles.selectionView}
         onStartShouldSetResponder={() => {
@@ -126,8 +136,8 @@ const DailyShifts = () => {
       <View
         style={{
           height: "35%",
-          backgroundColor: "#333",
-          width: "80%",
+          backgroundColor: "#355274",
+          width: "75%",
           flexDirection: "row",
           marginTop: 5,
           borderRadius: 20,
@@ -140,7 +150,7 @@ const DailyShifts = () => {
         <TextInput
           placeholder="Type Here"
           style={{
-            backgroundColor: "#333",
+            backgroundColor: "#355274",
             width: "100%",
             height: "70%",
             alignSelf: "flex-start",
@@ -156,11 +166,12 @@ const DailyShifts = () => {
           placeholderTextColor={"white"}
         />
       </View>
+      </ScrollView>
     </View>
   );
 };
 
-export default DailyShifts;
+export default Exhibits;
 
 const styles = StyleSheet.create({
   headerView: {
@@ -179,13 +190,13 @@ const styles = StyleSheet.create({
     paddingTop: 15
   },
   selectionView: {
-    height: "45%",
+    // height: "45%",
     // backgroundColor: "green",
     // alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
     width: "100%",
-    top:"3%"
+    // top:"3%"
   },
   empShiftsContainer: {
     // backgroundColor: "yellow",

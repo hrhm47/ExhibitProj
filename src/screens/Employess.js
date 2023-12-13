@@ -1,5 +1,8 @@
 import {
+  Alert,
   Image,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,90 +13,100 @@ import React, { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import DailyShiftsComponents from "../components/DailyShiftsComponents";
-// import * as Calendar from 'expo-calendar';
-import { Calendar,Agenda } from "react-native-calendars";
-
-const nameData = [
-  {
-    id: 1,
-    label: "Ali"
-  },
-  {
-    id: 2,
-    label: "Kabir"
-  },
-  {
-    id: 3,
-    label: "Salim"
-  }
-];
-
-const startTimeData = [
-  {
-    id: 1,
-    label: "8:00"
-  },
-  {
-    id: 2,
-    label: "9:00"
-  },
-  {
-    id: 3,
-    label: "10:00"
-  }
-];
-
-const endTimeData = [
-  {
-    id: 1,
-    label: "18:00"
-  },
-  {
-    id: 2,
-    label: "19:00"
-  },
-  {
-    id: 3,
-    label: "20:00"
-  }
-];
-
-const shiftTypeData = [
-  {
-    id: 1,
-    label: "Morning"
-  },
-  {
-    id: 2,
-    label: "Evening"
-  },
-  {
-    id: 3,
-    label: "Night"
-  }
-];
-
-const shitLocData = [
-  {
-    id: 1,
-    label: "Exhibit A"
-  },
-  {
-    id: 2,
-    label: "Exhibit B"
-  },
-  {
-    id: 3,
-    label: "Exhibit C"
-  }
-];
+import * as SQLite from "expo-sqlite";
+import TextInputField from "../components/TextInputField";
+import { useSelector, useDispatch } from "react-redux";
 
 const DailyShifts = () => {
+  // ==========================  for employee section ===================
   const [employeName, setEmployeName] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [shiftType, setShitType] = useState("");
-  const [openCalender, setOpenCalender] = useState(false);
+  const [gender, setGender] = useState("");
+  const [email, setEmail] = useState("");
+  const [Password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [hireDate, setHireDate] = useState("");
+
+  const data = useSelector((state) => state?.employees);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [db, setDb] = useState(SQLite.openDatabase("example.db"));
+
+  // employees is storing from admin with role too.
+
+  // const employeeParams= [
+  //   "Khalel Khaleef",
+  //   "12/11/1977",
+  //   "male",
+  //   "khalel@gmail.com",
+  //   "03120009998",
+  //   "Qatar",
+  //   "enginner",
+  //   "manager",
+  //   "khalel",
+  //   "123456",
+  //   "12/11/2020",
+  //   1
+  // ]
+
+  // db.transaction((tx) => {
+  //   tx.executeSql(
+  //     "INSERT INTO EMPLOYEES (name, date_of_birth, gender, email, phone, address, job_title, role, username, password, hire_date, manager_id) values (?, ?, ?, ?,?,?,?,?,?,?,?,?)",
+  //     managerParams,
+  //     (_, result) => {
+  //       console.log("Inserting Result:", result);
+  //     },
+  //     (_, error) => {
+  //       console.error("Error executing insert query:", error);
+  //     }
+  //   );
+  // });
+
+  const saveEmployeesData = () => {
+    // ==> employee attritubes name, date_of_birth, gender, email, phone, address, job_title, role, username, password, hire_date, manager_id)
+    if (
+      employeName.trim() == "" ||
+      gender.trim() == "" ||
+      email.trim() == "" ||
+      Password.trim() == "" ||
+      phoneNumber.trim() == "" ||
+      jobTitle.trim() == "" ||
+      hireDate.trim() == ""
+    ) {
+      return Alert.alert("Error", "Please fill all the fields");
+    } else {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "INSERT INTO EMPLOYEES (name, gender, email, phone ,job_title,role,  password, hire_date) values (?, ?, ?, ?,?,?,?,?)",
+          [
+            employeName,
+            gender,
+            email,
+            phoneNumber,
+            jobTitle,
+            "employee",
+            Password,
+            hireDate
+          ],
+          (_, result) => {
+            setEmployeName("");
+            setGender("");
+            setEmail("");
+            setPassword("");
+            setPhoneNumber("");
+            setJobTitle("");
+            setHireDate("");
+            Alert.alert("Success", "Employee Added Successfully");
+            // console.log("Inserting Result:", result);
+          },
+          (_, error) => {
+            console.error("Error executing insert query:", error);
+          }
+        );
+      });
+    }
+  };
+
   return (
     <View
       style={{
@@ -101,174 +114,126 @@ const DailyShifts = () => {
         alignItems: "center",
         backgroundColor: "#002F65"
       }}
-     
     >
       <View style={styles.headerView}>
-        <Text style={{ fontSize: 25 }}>Hello, Jhon Doe</Text>
+        <Text style={{ fontSize: 25 }}>
+          Hello,{" "}
+          {data?.employeeLogin != null ? data?.employeeLogin[0]?.name : "admin"}
+        </Text>
       </View>
 
       <View style={styles.tagView}>
         <Text style={styles.textStyle((font = 25))}>Employees Information</Text>
       </View>
       <View style={styles.selectionView}>
-        <View style={styles.empShiftsContainer}>
-          {/* EMPLOYE NAME */}
-          <DailyShiftsComponents
-            identifier="EmployeName"
-            labelText="EMPLOYEE NAME"
-            mapData={nameData}
-          />
+        <ScrollView
+          style={styles.empShiftsContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            flexGrow: 1,
+            alignItems: "center",
+            paddingBottom: 20
+          }}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true} // or "always"
+        >
+          <View style={{ alignItems: "center" }}>
+            {/* EMPLOYE NAME */}
+            <TextInputField
+              identifier="Employe_Name"
+              text="EMPLOYEE NAME"
+              placeholder={"Enter Employee Name"}
+              setEmployeName={setEmployeName}
+              // mapData={nameData}
+            />
 
-          {/* START TIME */}
-          <DailyShiftsComponents
-            identifier="startTime"
-            labelText="START TIME"
-            mapData={startTimeData}
-          />
+            {/* START TIME */}
+            <TextInputField
+              identifier="Gender"
+              text="GENDER"
+              placeholder={"Select Gender"}
+              setGender={setGender}
+            />
 
-          {/* Shift Type */}
-          <DailyShiftsComponents
-            identifier="shiftType"
-            labelText="SHIFT TYPE"
-            mapData={shiftTypeData}
-          />
-        </View>
+            {/* Shift Type */}
+            <TextInputField
+              identifier="Email"
+              text="Email"
+              placeholder={"Enter Email"}
+              setEmail={setEmail}
+            />
 
-        <View style={styles.empShiftsContainer}>
-          {/* EMPLOYE NAME */}
-          <DailyShiftsComponents
-            identifier="employeeID"
-            labelText="EMPLOYEE ID"
-            // mapData={nameData}
-          />
+            <TextInputField
+              identifier="Password"
+              text="PASSWORD"
+              placeholder={"Enter Password"}
+              setPassword={setPassword}
+            />
+            <TextInputField
+              identifier="Phone_Number"
+              text="PHONE NUMBER"
+              placeholder={"Enter Phone Number"}
+              setPhoneNumber={setPhoneNumber}
+            />
 
-          {/* START TIME */}
-          <DailyShiftsComponents
-            identifier="endTime"
-            labelText="END TIME"
-            mapData={endTimeData}
-          />
+            {/* START TIME */}
+            <TextInputField
+              identifier="Job_Title"
+              text="JOB TITLE"
+              placeholder={"Enter Job Title"}
+              setJobTitle={setJobTitle}
+            />
 
-          {/* Shift Type */}
-          <DailyShiftsComponents
-            identifier="shiftLocation"
-            labelText="SHIFT LOCATION"
-            mapData={shitLocData}
-          />
-        </View>
+            {/* Shift Type */}
+            <TextInputField
+              identifier="Hire_Date"
+              text="HIRE DATE"
+              placeholder={"Enter Hire Date"}
+              setHireDate={setHireDate}
+            />
+          </View>
+        </ScrollView>
       </View>
-      <TouchableOpacity style={styles.saveButtonStyle}>
-        <Text style={styles.textStyle((font = 15))}>SAVE</Text>
-      </TouchableOpacity>
-
+      {/* <Modal animationType="fade" transparent={true} visible={true}> */}
       <View
         style={{
-          height: "35%",
-          backgroundColor: "#333",
-          width: "80%",
-          flexDirection: "row",
-          marginTop: 5,
-          borderRadius: 20,
-          padding: 5
+          height: "100%",
+          backgroundColor: "transparent",
+          justifyContent: "flex-end",
+          alignSelf: "flex-end",
+          position: "absolute",
+          bottom: 10
         }}
-        
-        
       >
-        {openCalender ? (
-          <>
-          <Agenda
-          style={{
-            // borderWidth: 1,
-            // borderColor: 'gray',
-            // width:"70%",
-            height: "100%",
-          }}
-          headerStyle={{width:"70%"}}
-          
-          />
-          <View style={{width:"10%"}} onStartShouldSetResponder={()=>setOpenCalender(false)}>
-          </View>
-            
-          </>
-        ) : (
-          <>
-            <View
-              style={[
-                styles.empShiftsContainer,
-                {
-                  width: "30%",
-                  paddingTop: 10,
-                  justifyContent: "space-around",
-                  alignItems: "flex-start",
-                  paddingLeft: 5
-                }
-              ]}
-            >
-              <Text style={styles.empText}>Emp Name</Text>
-              <Text style={styles.empText}>Emp ID</Text>
-              <Text style={styles.empText}>Start Time</Text>
-              <Text style={styles.empText}>End Time</Text>
-              <Text style={styles.empText}>Type</Text>
-              <Text style={styles.empText}>Location</Text>
-            </View>
-            <View style={{ borderWidth: 1, borderColor: "white" }}></View>
-            <View
-              style={[
-                styles.empShiftsContainer,
-                {
-                  width: "40%",
-                  paddingTop: 10,
-                  justifyContent: "space-around",
-                  alignItems: "flex-start",
-                  paddingLeft: 5
-                }
-              ]}
-            >
-              <Text style={styles.empText}>Mike Jhonson</Text>
-              <Text style={styles.empText}>3</Text>
-              <Text style={styles.empText}>8:00</Text>
-              <Text style={styles.empText}>18:00</Text>
-              <Text style={styles.empText}>Morning</Text>
-              <Text style={styles.empText}>A</Text>
-            </View>
-            <View
+        <View
+          style={{ backgroundColor: "#079DDF", borderRadius: 20, padding: 6 }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              saveEmployeesData();
+            }}
+            style={{
+              alignSelf: "center",
+              backgroundColor: "#002F65",
+              margin: 10,
+              padding: 10,
+              borderRadius: 20
+            }}
+          >
+            <Text
               style={{
-                backgroundColor: "#333",
-                width: "30%",
-                justifyContent: "space-between",
-                alignItems: "center"
+                color: "white",
+                fontSize: 20,
+                letterSpacing: 2,
+                fontWeight: "600"
               }}
             >
-              {/* <Calendar.CalendarType /> */}
-              {/* <Calendar
-            /> */}
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#079DDF",
-                  alignItems: "center",
-                  padding: 8,
-                  borderRadius: 10
-                }}
-                onPress={() => {
-                  setOpenCalender((openCalender) => !openCalender);
-                }}
-              >
-                <Icon name="calendar" size={30} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#079DDF",
-                  alignItems: "center",
-                  padding: 8,
-                  borderRadius: 10
-                }}
-              >
-                <Text style={styles.empText}>Edit</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+              OK
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
+      {/* </Modal> */}
     </View>
   );
 };
@@ -292,18 +257,21 @@ const styles = StyleSheet.create({
     paddingTop: 15
   },
   selectionView: {
-    height: "40%",
+    // height: "90%",
     // backgroundColor: "green",
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%"
+    alignItems: "center"
+    // flexDirection: "row",
+    // justifyContent: "center",
+    // width: "100%"
   },
   empShiftsContainer: {
+    // height: "100%",
     // backgroundColor: "yellow",
-    width: "50%",
-    height: "100%",
-    alignItems: "center"
+    width: "90%",
+    // marginBottom:90
+    // height: "100%",
+    marginBottom: 100
+    // marginBottom: "43%"
   },
   saveButtonStyle: {
     backgroundColor: "#079DDF",
