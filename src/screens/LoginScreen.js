@@ -96,9 +96,10 @@ const LoginScreen = () => {
             [data.userInputEmail.toLowerCase(), data.userInputPassword],
             (_, result) => {
               if (result.rows.length > 0) {
-                console.log("Selecting Result:", result.rows._array[0].name);
+                console.log("Selecting Result:", result.rows._array[0].name); 
+                console.log("Selecting Result:", result.rows._array[0]); 
                 dispatch(employeeActions.setEmployeeLogin(result.rows._array));
-                if (result.rows._array[0].role === "manager") {
+                if (result.rows._array[0].job_title === "Manager") {
                   navigation.navigate("HomeScreen");
                 }
                 else {

@@ -10,9 +10,14 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import { useSelector, useDispatch } from "react-redux";
+import {useIsFocused, useNavigation} from "@react-navigation/native"
+import * as SQLite from "expo-sqlite";
+import Icon from "react-native-vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const techId = [
   {
@@ -46,14 +51,165 @@ const techName = [
 
 const ExhibitsIssues = () => {
   const [employeName, setEmployeName] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [shiftType, setShitType] = useState("");
-  const [openCalender, setOpenCalender] = useState(false);
+  // const [issuesLength, setIssuesLength] = useState(0);
+  // let issueLength=0;
+  
+  const [exbName, setExbName] = useState("");
+  const [exbId, setExbId] = useState("");
+  const [exbDate, setExbDate] = useState("");
+  const [exbStatus, setExbStatus] = useState("");
+  const [exbPriority, setExbPriority] = useState("");
+  const [exbempName, setExbempName] = useState("");
+  const [nameData, setNameData] = useState([]);
 
+
+  // all data storing in this state one by one
+
+  const [allEmployeName, setAllEmployeName] = useState([]);
+  const [allDateIssued, setAllDateIssued] = useState([]);
+  const [allStatus, setAllStatus] = useState([]);
+  const [allPriority, setAllPriority] = useState([]);
+  const [allExhibitData, setAllExhibitData] = useState([]);
+
+  const foucused = useIsFocused();
   const data = useSelector((state) => state?.employees);
+  const [db, setDb] = useState(SQLite.openDatabase("example.db"))
   // console.log(data?.employeeLogin[0]?.employee_id);
   // const dispatch = useDispatch();
+
+  let allEmp=[];
+  let allDate=[];
+  let allStatuses=[];
+  let allPrioritys=[];
+  let allExhibits=[];
+  let newNames = [];
+
+  useEffect(()=>{
+    if (foucused){
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT * FROM EXHIBIT_ISSUES",[],(_, result) => {
+            // console.log("result", result.rows._array);
+            result.rows._array.map((item,index)=>{
+              
+              // now getting all Employee Names
+              db.transaction((emptx) => {
+                emptx.executeSql(
+                  "SELECT * FROM EMPLOYEES WHERE employee_id = ?",[item.employee_id],(_, result) => {
+                    // console.log("result",index, result.rows._array);
+                    allEmp.push({id:index,label:result.rows._array[0].name});
+                    // setAllEmployeName(allEmp)
+                  }
+                )
+              })
+
+              // now getting all Date Issued
+              allDate.push({id:index,label:item.issue_date})
+              
+              // all statues
+              allStatuses.push({id:index,label:item.status})
+
+              // all priorities
+              allPrioritys.push({id:index,label:item.priority})
+
+              // all exhibits
+              allExhibits.push({id:index,label:item})
+
+            })
+
+            console.log("allEmp",allEmp,allDate,allStatuses,allPrioritys,allExhibits);
+            setAllEmployeName(allEmp)
+            setAllDateIssued(allDate)
+            setAllStatus(allStatuses)
+            setAllPriority(allPrioritys)
+            setAllExhibitData(allExhibits)
+            
+          },
+          (_, error) => {
+            console.error("Error executing select query:", error);
+          }
+        )
+      })
+
+    }
+    (async () => {
+      try {
+        const exibitData = JSON.parse(
+          await AsyncStorage.getItem("exbibitData")
+        );
+          console.log("exibitData", exibitData);
+        if (exibitData && Array.isArray(exibitData)) {
+          exibitData.forEach((item, index) => {
+            // console.log("item", item);
+            newNames.push({
+              id: index,
+              label: item.exhibitName
+            });
+          });
+        }
+        setNameData(newNames);
+      } catch (error) {
+        console.error("Error retrieving and parsing exhibit data:", error);
+        // Handle the error as needed
+      }
+    })();
+  },[foucused])
+
+  const [issueLength, setIssueLength] = useState(0);
+
+  const rightClickMove=()=>{
+    // console.log("rightClickMove", allExhibitData);
+    // const arrayDatalength=allExhibitData.length;
+    console.log(issueLength);
+    const arrayDataLength = allExhibitData.length;
+    console.log(nameData[allExhibitData[issueLength-1]?.label?.exhibit_id]?.label);
+    if (issueLength <= arrayDataLength - 1) {
+      // console.log(arrayDatalength,"issueLength",allEmployeName[issueLength]?.label,
+      // allExhibitData[issueLength]?.label.priority,
+      // allExhibitData[issueLength]?.label.issue_date,
+      // allExhibitData[issueLength]?.label.exhibit_id
+      // );
+      // // // name done
+      setExbName(nameData[allExhibitData[issueLength]?.label?.exhibit_id]?.label)
+      setExbId (allExhibitData[issueLength]?.label.exhibit_id);
+      setExbDate(allExhibitData[issueLength]?.label.issue_date);
+      setExbStatus(allExhibitData[issueLength]?.label.status);
+      setExbPriority(allExhibitData[issueLength]?.label.priority);
+      setExbempName(allEmployeName[issueLength]?.label);
+      
+      setIssueLength((prevLength) => prevLength + 1);
+    }else{
+      alert("Alert","No more data")
+    }
+    // issueLength=issueLength+1;
+  }
+
+  const leftClickMove=()=>{
+    console.log("halar khaab", issueLength);
+
+    if (issueLength > 0) {
+      // console.log(arrayDatalength,"issueLength",allEmployeName[issueLength]?.label,
+      // allExhibitData[issueLength]?.label.priority,
+      // allExhibitData[issueLength]?.label.issue_date,
+      // allExhibitData[issueLength]?.label.exhibit_id
+      // );
+      
+      // // name done
+      setExbName(nameData[allExhibitData[issueLength]?.label?.exhibit_id]?.label)
+      setExbId (allExhibitData[issueLength]?.label.exhibit_id);
+      setExbDate(allExhibitData[issueLength]?.label.issue_date);
+      setExbStatus(allExhibitData[issueLength]?.label.status);
+      setExbPriority(allExhibitData[issueLength]?.label.priority);
+      setExbempName(allEmployeName[issueLength]?.label);
+      
+      setIssueLength((prevLength) => prevLength - 1)
+    }else{
+      alert("Alert","No more data")
+    }
+    // issueLength=issueLength-1;
+  }
+
+
 
   return (
     <View
@@ -107,6 +263,8 @@ const ExhibitsIssues = () => {
             <Text style={styles.empText}>DATE ISSUED:</Text>
             <Text style={styles.empText}>STATUS:</Text>
             <Text style={styles.empText}>PRIORITY:</Text>
+            <Text style={styles.empText}>EMP NAME:</Text>
+
           </View>
           {/* <View style={{ borderWidth: 1, borderColor: "white" }}></View> */}
           <View
@@ -121,14 +279,29 @@ const ExhibitsIssues = () => {
               }
             ]}
           >
-            <Text style={styles.empText}>Science Exhibit</Text>
-            <Text style={styles.empText}>3</Text>
-            <Text style={styles.empText}>6-10-2023</Text>
-            <Text style={styles.empText}>High</Text>
-            <Text style={styles.empText}>Exhibit power failure</Text>
+            {allExhibitData?
+            <>
+            <Text style={styles.empText}>{exbName?exbName:"Science"}</Text>
+            <Text style={styles.empText}>{exbId?exbId:"0"}</Text>
+            <Text style={styles.empText}>{exbDate?exbDate:"00-00-0000"}</Text>
+            <Text style={styles.empText}>{exbStatus?exbStatus:"High"}</Text>
+            <Text style={styles.empText}>{exbPriority?exbPriority:"Exhibit power failure"}</Text>
+            <Text style={styles.empText}>{exbempName?exbempName:"Employee"}</Text>
+            </>
+            :
+            null
+            }
           </View>
         </View>
 
+<View style={{flexDirection:"row", margin:5,alignItems:"center", justifyContent:"center"}}>
+  <TouchableOpacity onPress={()=>leftClickMove()}>
+    <Icon name="chevron-back-outline" size={40} color="#fff" style={{paddingRight:10}}/>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={()=>rightClickMove()}>
+    <Icon name="chevron-forward-outline" size={40} color="#fff"  style={{paddingLeft:10}} />
+  </TouchableOpacity>
+</View>
         <View
           style={{
             height: "50%",

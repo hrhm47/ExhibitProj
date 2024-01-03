@@ -12,8 +12,7 @@ const WelcomeScreen = () => {
   const [progress, setProgress] = useState(0);
   const [indeterminate, setIndeterminate] = useState(true);
   // const db = SQLite.openDatabase("newMain1.db");
-  const [db, setDb] = useState(SQLite.openDatabase('example.db'));
-
+  const [db, setDb] = useState(SQLite.openDatabase("example.db"));
 
   const initDataBase = () => {
     console.log("initDataBase");
@@ -138,9 +137,7 @@ const WelcomeScreen = () => {
           name TEXT,
           description TEXT,
           type TEXT,
-          location TEXT,
-          installation_date TEXT,
-          qr_code BLOB
+          location TEXT
       );`,
         [],
         (_, result) => {
@@ -159,17 +156,11 @@ const WelcomeScreen = () => {
           issue_id INTEGER PRIMARY KEY AUTOINCREMENT,
           employee_id INTEGER,
           exhibit_id INTEGER,
-          tech_id INTEGER,
           issue_date TEXT,
-          resolve_date TEXT,
           status TEXT,
           priority TEXT,
-          issue_details TEXT,
-          resolve_details TEXT,
-          FOREIGN KEY (employee_id) REFERENCES EMPLOYEES(employee_id),
-          FOREIGN KEY (exhibit_id) REFERENCES EXHIBIT(exhibit_id),
-          FOREIGN KEY (tech_id) REFERENCES TECHNICIAN(tech_id)
-      );`,
+          issue_details TEXT
+          );`,
         [],
         (_, result) => {
           console.log("Table created successfully:", result);
@@ -197,35 +188,43 @@ const WelcomeScreen = () => {
           // Alert.alert("Welcome to Scientific Lab With Tables Created Successfully")
         },
         (_, error) => {
-          console.error('Error creating table:', error);
+          console.error("Error creating table:", error);
         }
       );
     });
-
-
-
-
   };
 
-
-  const insertDataBase=()=>{
-    const managerParams=["khan waqar","12/09/1987","male","khanwaqar@gmail.com","03125634567","pindi","clerk","employee","khanWaqar","123456","12/09/2020",1]
+  const insertDataBase = () => {
+    const managerParams = [
+      "khan waqar",
+      "12/09/1987",
+      "male",
+      "khanwaqar@gmail.com",
+      "03125634567",
+      "pindi",
+      "clerk",
+      "employee",
+      "khanWaqar",
+      "123456",
+      "12/09/2020",
+      1
+    ];
     // AsyncStorage.setItem("isFirstTime",JSON.stringify(managerParams));
 
-    const employeeParams= [
+    const employeeParams = [
       "Khalel Khaleef",
       "12/11/1977",
       "male",
       "khalel@gmail.com",
       "03120009998",
       "Qatar",
-      "enginner",
-      "manager",
+      "Manager",
+      "Manager",
       "khalel",
       "123456",
       "12/11/2020",
       1
-    ]
+    ];
 
     db.transaction((tx) => {
       tx.executeSql(
@@ -240,7 +239,6 @@ const WelcomeScreen = () => {
       );
     });
 
-
     db.transaction((tx) => {
       tx.executeSql(
         "INSERT INTO EMPLOYEES (name, date_of_birth, gender, email, phone, address, job_title, role, username, password, hire_date, manager_id) values (?, ?, ?, ?,?,?,?,?,?,?,?,?)",
@@ -254,9 +252,7 @@ const WelcomeScreen = () => {
         }
       );
     });
-
-
-  }
+  };
 
   useEffect(() => {
     let interval;

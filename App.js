@@ -27,6 +27,8 @@ import EmpCamera from "./src/screens/EmpCamera";
 import EmpQrCode from "./src/screens/EmpQrCode";
 import EmpAttendance from "./src/screens/EmpAttendance";
 import EmpShifts from "./src/screens/EmpShifts";
+import EmployeeList from "./src/screens/EmployeeList";
+import ExhibitsCreation from "./src/screens/ExhibitsCreation";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -36,8 +38,7 @@ export default function App() {
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="Welcome"
-            screenOptions={{ headerShown: false }}
-          >
+            screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Welcome" component={WelcomeScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="HomeScreen" component={HomeScreen} />
@@ -53,6 +54,8 @@ export default function App() {
             <Stack.Screen name="EmpQrCode" component={EmpQrCode} />
             <Stack.Screen name="EmpAttendance" component={EmpAttendance} />
             <Stack.Screen name="EmpShifts" component={EmpShifts} />
+            <Stack.Screen name="EmployeeList" component={EmployeeList} />
+            <Stack.Screen name="CreateExhibits" component={ExhibitsCreation}/>
           </Stack.Navigator>
         </NavigationContainer>
         <StatusBar barStyle="default" />

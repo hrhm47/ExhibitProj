@@ -30,7 +30,10 @@ const TextInputField = ({
   setEmpEditName,
   setEmpEditEmail,
   setEmpEditUserName,
-  setEmpEditPassword
+  setEmpEditPassword,
+  setExhibitName,
+  setExhibitType,
+  setExhibitLocation
 }) => {
   // ==========================  for employee section ===================
   // const [employeName, setEmployeName] = useState("");
@@ -106,6 +109,15 @@ const TextInputField = ({
       case 'EmployeeEditPassword':{
         return setEmpEditPassword(text);
       }
+      case 'exhibitName':{
+        return setExhibitName(text);
+      }
+      case 'exhibitType':{
+        return setExhibitType(text);
+      }
+      case 'exhibitLocation':{
+        return setExhibitLocation(text);
+      }
 
       default: {
         return;
@@ -136,7 +148,7 @@ const TextInputField = ({
           color: "white",
           paddingHorizontal: 15,
           fontSize: 15,
-          borderRadius: 10
+          // borderRadius: 10
         }}
         secureTextEntry={identifier == "passwordField" ? true : false}
         onChangeText={(text) => changeHandler(text)}

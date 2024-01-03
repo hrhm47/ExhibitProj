@@ -10,12 +10,13 @@ import {
   View
 } from "react-native";
 import React, { useState } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import { Picker } from "@react-native-picker/picker";
 import DailyShiftsComponents from "../components/DailyShiftsComponents";
 import * as SQLite from "expo-sqlite";
 import TextInputField from "../components/TextInputField";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
 const DailyShifts = () => {
   // ==========================  for employee section ===================
@@ -27,10 +28,102 @@ const DailyShifts = () => {
   const [jobTitle, setJobTitle] = useState("");
   const [hireDate, setHireDate] = useState("");
 
+
   const data = useSelector((state) => state?.employees);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [db, setDb] = useState(SQLite.openDatabase("example.db"));
+  
+  const GENDER=[
+    {
+      id:1,
+      label:"Male"
+    },
+    {
+      id:2,
+      label:"Female"
+    },
+    {
+      id:3,
+      label:"Other"
+    }
+  ]
+
+const Job_Title=[
+  {
+    id:1,
+    label:"Manager"
+  },
+  {
+    id:2,
+    label:"Employee"
+  },
+  {
+    id:3,
+    label:"Technician "
+  }
+]
+
+const HireDates=[
+  {
+    id:1,
+    label:"12/11/2023"
+  },
+  {
+    id:2,
+    label:"13/11/2023"
+  },
+  {
+    id:3,
+    label:"14/11/2023"
+  },
+  {
+    id:4,
+    label:"15/11/2023"
+  },
+  {
+    id:5,
+    label:"16/11/2023"
+  },
+  {
+    id:6,
+    label:"17/11/2023"
+  },
+  {
+    id:7,
+    label:"18/11/2023"
+  },
+  {
+    id:8,
+    label:"19/11/2023"
+  },
+  {
+    id:9,
+    label:"20/11/2023"
+  },
+  {
+    id:10,
+    label:"21/11/2023"
+  },
+  {
+    id:11,
+    label:"22/12/2023"
+  },
+  {
+    id:12,
+    label:"13/12/2023"
+  },
+  {
+    id:13,
+    label:"14/12/2023"
+  },
+  {
+    id:14,
+    label:"12/12/2023"
+  }
+]
+
+
 
   // employees is storing from admin with role too.
 
@@ -63,15 +156,16 @@ const DailyShifts = () => {
   // });
 
   const saveEmployeesData = () => {
+    // console.log("saveEmployeesData", GENDER[gender-1].label, HireDates[hireDate-1].label, Job_Title[jobTitle-1].label);
     // ==> employee attritubes name, date_of_birth, gender, email, phone, address, job_title, role, username, password, hire_date, manager_id)
     if (
       employeName.trim() == "" ||
-      gender.trim() == "" ||
+      !gender||
       email.trim() == "" ||
       Password.trim() == "" ||
       phoneNumber.trim() == "" ||
-      jobTitle.trim() == "" ||
-      hireDate.trim() == ""
+      !jobTitle||
+      !hireDate
     ) {
       return Alert.alert("Error", "Please fill all the fields");
     } else {
@@ -80,13 +174,13 @@ const DailyShifts = () => {
           "INSERT INTO EMPLOYEES (name, gender, email, phone ,job_title,role,  password, hire_date) values (?, ?, ?, ?,?,?,?,?)",
           [
             employeName,
-            gender,
+            GENDER[gender-1].label,
             email,
             phoneNumber,
-            jobTitle,
+            Job_Title[jobTitle-1].label,
             "employee",
             Password,
-            hireDate
+            HireDates[hireDate-1].label
           ],
           (_, result) => {
             setEmployeName("");
@@ -107,6 +201,9 @@ const DailyShifts = () => {
     }
   };
 
+
+  const navigation = useNavigation();
+
   return (
     <View
       style={{
@@ -116,6 +213,8 @@ const DailyShifts = () => {
       }}
     >
       <View style={styles.headerView}>
+        
+
         <Text style={{ fontSize: 25 }}>
           Hello,{" "}
           {data?.employeeLogin != null ? data?.employeeLogin[0]?.name : "admin"}
@@ -123,7 +222,7 @@ const DailyShifts = () => {
       </View>
 
       <View style={styles.tagView}>
-        <Text style={styles.textStyle((font = 25))}>Employees Information</Text>
+        <Text style={[styles.textStyle((font = 25)),{textAlign:"center", alignSelf:"center"}]} >Employees Information</Text>
       </View>
       <View style={styles.selectionView}>
         <ScrollView
@@ -132,7 +231,8 @@ const DailyShifts = () => {
           contentContainerStyle={{
             flexGrow: 1,
             alignItems: "center",
-            paddingBottom: 20
+            paddingBottom: 20,
+            // backgroundColor:"yellow"
           }}
           keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets={true} // or "always"
@@ -148,11 +248,20 @@ const DailyShifts = () => {
             />
 
             {/* START TIME */}
-            <TextInputField
+            {/* <TextInputField
               identifier="Gender"
               text="GENDER"
               placeholder={"Select Gender"}
               setGender={setGender}
+            /> */}
+            <DailyShiftsComponents
+              identifier={"genderForEmoployee"}
+              labelText={"GENDER"}
+              mapData={GENDER}
+              setGender={setGender}
+              margin={10}
+              height={10}
+
             />
 
             {/* Shift Type */}
@@ -176,25 +285,31 @@ const DailyShifts = () => {
               setPhoneNumber={setPhoneNumber}
             />
 
-            {/* START TIME */}
-            <TextInputField
-              identifier="Job_Title"
-              text="JOB TITLE"
-              placeholder={"Enter Job Title"}
+            <DailyShiftsComponents
+              identifier={"Job_Title"}
+              labelText={"JOB TITLE"}
+              mapData={Job_Title}
               setJobTitle={setJobTitle}
-            />
+              margin={10}
+              height={10}
 
-            {/* Shift Type */}
-            <TextInputField
-              identifier="Hire_Date"
-              text="HIRE DATE"
-              placeholder={"Enter Hire Date"}
+            />
+             <DailyShiftsComponents
+              identifier={"Hire_Date"}
+              labelText={"HIRE DATE"}
+              mapData={HireDates}
               setHireDate={setHireDate}
+              margin={10}
+              height={10}
+
             />
           </View>
         </ScrollView>
       </View>
       {/* <Modal animationType="fade" transparent={true} visible={true}> */}
+    
+
+
       <View
         style={{
           height: "100%",
@@ -203,6 +318,38 @@ const DailyShifts = () => {
           alignSelf: "flex-end",
           position: "absolute",
           bottom: 10
+        }}
+      >
+        <View
+          style={{ backgroundColor: "#079DDF", borderRadius: 20, padding: 6 }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('EmployeeList')
+              // saveEmployeesData();
+            }}
+            style={{
+              alignSelf: "center",
+              backgroundColor: "#002F65",
+              margin: 10,
+              padding: 10,
+              borderRadius: 20
+            }}
+          >
+           <Icon name="navigate-next" size={30} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+
+      <View
+        style={{
+          height: "100%",
+          backgroundColor: "transparent",
+          justifyContent: "flex-end",
+          alignSelf: "flex-end",
+          position: "absolute",
+          bottom: 100
         }}
       >
         <View
@@ -246,15 +393,18 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#079DDF",
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     alignItems: "center",
-    paddingLeft: 10
+    paddingLeft: 10,
+    paddingRight: 10
   },
   tagView: {
-    alignItems: "flex-start",
+    // alignItems: "center",
+    // justifyContent:"center",
     width: "100%",
     paddingLeft: 15,
-    paddingTop: 15
+    paddingTop: 10,
+    flexDirection:"row"
   },
   selectionView: {
     // height: "90%",

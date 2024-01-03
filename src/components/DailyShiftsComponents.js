@@ -15,6 +15,7 @@ const DailyShiftsComponents = ({
   labelText,
   mapData,
   margin,
+  height,
   setEmployeName,
   setStartTime,
   setEndTime,
@@ -27,7 +28,19 @@ const DailyShiftsComponents = ({
   setEmpEditEmail,
   setEmpEditUserName,
   setEmpEditPassword,
-  identifierLabel
+  identifierLabel,
+  setWeekDay,
+  setCloseMe,
+  setGender,
+  setJobTitle,
+  setHireDate,
+  setExhibitName,
+  setExhibitType,
+  setExhibitLocation,
+  setPriorityIssues,
+  setStatusIssues,
+  setIssueDates,
+  setExhibitNamesId
 }) => {
   const [employeNamee, setEmployeNamee] = useState("");
   // const [startTime, setStartTime] = useState("");
@@ -64,22 +77,55 @@ const DailyShiftsComponents = ({
         return setReportTypeValue(value);
       }
 
-      case "EmployeeEditName":{
+      case "EmployeeEditName": {
         return setEmpEditName(value);
       }
 
-      case "EmployeeEditEmail":{
+      case "EmployeeEditEmail": {
         return setEmpEditEmail(value);
       }
 
-      case "EmployeeEditUserName":{
+      case "EmployeeEditUserName": {
         return setEmpEditUserName(value);
       }
 
-      case "EmpolyeeEditPassword":{
-        return setEmpEditPassword(value);  
+      case "EmpolyeeEditPassword": {
+        return setEmpEditPassword(value);
       }
-
+      case "weekdaysData": {
+        return setWeekDay(value);
+      }
+      case "genderForEmoployee": {
+        return setGender(value);
+      }
+      case "Job_Title": {
+        setJobTitle(value);
+        return;
+      }
+      case "Hire_Date": {
+        return setHireDate(value);
+      }
+      case "ExhibitName":{
+        return setExhibitName(value);
+      }
+      case "exhibitType":{
+        return setExhibitType(value);
+      }
+      case "Location":{
+        return setExhibitLocation(value);
+      }
+      case "issueDateinIssues":{
+        return setIssueDates(value);
+      }
+      case "statusInIssues":{
+        return setStatusIssues(value);
+      }
+      case "priorityInIssues":{
+        return setPriorityIssues(value);
+      }
+      case "exhibitDatainIssues":{
+        return setExhibitNamesId(value);
+      }
       default: {
         return;
       }
@@ -91,46 +137,58 @@ const DailyShiftsComponents = ({
       style={{
         flexDirection: "column",
         justifyContent: "center",
-        width: "80%",
+        width: height == 0 ? "100%" : height == 10 ? 270 : "80%",
+
+        // backgroundColor:"red",
         // height:Platform.OS=="ios"? 10: null,
-        margin: margin == 0 ? margin : 10
+        margin: !margin ? 10 : margin != 0 ? 0 : 10,
+        marginTop: margin == 10 ? margin : 0
       }}
     >
-      <Text style={{ color: "white", paddingBottom: 3, fontSize: 16 }}>
-        {labelText}
-      </Text>
+      {labelText && (
+        <Text
+          style={{
+            color: "white",
+            paddingBottom: 3,
+            fontSize: height == 10 ? 20 : 16,
+            fontWeight: height == 10 ? "300" : null
+          }}
+        >
+          {labelText}
+        </Text>
+      )}
       {mapData ? (
         <Picker
           style={{
             backgroundColor: "#355274",
-            borderRadius: 20,
+            // backgroundColor: "red",
+            // borderRadius: 20,
+            width: "100%",
             color: "white",
-            height: 50,
+            height: 50
           }}
           //   itemStyle={{ color: "white" }}
-
+          collapsable={true}
           testID="basic-picker"
           selectedValue={employeNamee}
           onValueChange={(v) => {
             // console.log(j, "v")
             selectPickerValue(v);
           }}
-          accessibilityLabel="Basic Picker Accessibility Label"
-          itemStyle={{color:"white", fontSize: 15 , height: 50,}}
+          // accessibilityLabel="Basic Picker Accessibility Label"
+
+          itemStyle={{ color: "white", fontSize: 15, height: 50 }}
         >
           {mapData?.map((item, index) => (
             <Picker.Item
-            // style={{color:"white",}}
+              // style={{color:"white",}}
               label={item.label ? item.label : item}
               value={item.id ? item.id : index}
               key={index}
             />
           ))}
         </Picker>
-      )
-      :
-      identifierLabel?
-      (
+      ) : identifierLabel ? (
         <>
           <View style={{ backgroundColor: "#355274" }}>
             <Text style={{ color: "white", padding: 15, fontSize: 16 }}>
@@ -138,9 +196,7 @@ const DailyShiftsComponents = ({
             </Text>
           </View>
         </>
-      )
-            
-      : (
+      ) : (
         <>
           <View style={{ backgroundColor: "#355274" }}>
             <Text style={{ color: "white", padding: 15, fontSize: 16 }}>
